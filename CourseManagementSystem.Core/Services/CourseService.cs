@@ -9,14 +9,14 @@ using CourseManagementSystem.API.ServiceContracts;
 
 namespace CourseManagementSystem.Core.Services
 {
-    public class CourseService : ICourseService
+    internal class CourseService : ICourseService
     {
-        public Task<CourseResponse> AddCourse(ModuleAddRequest moduleAddRequest)
+        public Task<CourseResponse> AddCourse(CourseAddRequest courseAddRequest)
         {
             throw new NotImplementedException();
         }
 
-        public Task<CourseResponse> DeleteCourse(Guid moduleId)
+        public Task<CourseResponse> DeleteCourse(Guid courseId)
         {
             throw new NotImplementedException();
         }
@@ -26,7 +26,7 @@ namespace CourseManagementSystem.Core.Services
             throw new NotImplementedException();
         }
 
-        public Task<CourseResponse> GetCourseById(Guid moduleId)
+        public Task<CourseResponse> GetCourseById(Guid courseId)
         {
             throw new NotImplementedException();
         }
@@ -36,7 +36,7 @@ namespace CourseManagementSystem.Core.Services
             throw new NotImplementedException();
         }
 
-        public Task<CourseResponse> UpdateCourse(ModuleUpdateRequest moduleUpdateRequest)
+        public Task<CourseResponse> UpdateCourse(CourseUpdateRequest courseUpdateRequest)
         {
             throw new NotImplementedException();
         }

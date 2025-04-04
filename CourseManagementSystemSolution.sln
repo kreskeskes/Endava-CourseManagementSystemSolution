@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CourseManagementSystem.API"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CourseManagementSystem.Core", "CourseManagementSystem.Core\CourseManagementSystem.Core.csproj", "{78DC5217-2197-4150-A4BB-DC6190A20546}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CourseManagementSystem.Infrastructure", "CourseManagementSystem.Infrastructure\CourseManagementSystem.Infrastructure.csproj", "{399CDDE6-A37B-4962-894B-60F15DE291A0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{78DC5217-2197-4150-A4BB-DC6190A20546}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{78DC5217-2197-4150-A4BB-DC6190A20546}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{78DC5217-2197-4150-A4BB-DC6190A20546}.Release|Any CPU.Build.0 = Release|Any CPU
+		{399CDDE6-A37B-4962-894B-60F15DE291A0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{399CDDE6-A37B-4962-894B-60F15DE291A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{399CDDE6-A37B-4962-894B-60F15DE291A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{399CDDE6-A37B-4962-894B-60F15DE291A0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

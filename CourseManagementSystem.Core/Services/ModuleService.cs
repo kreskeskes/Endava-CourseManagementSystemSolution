@@ -15,7 +15,7 @@ namespace CourseManagementSystem.Core.Services
             throw new NotImplementedException();
         }
 
-        public Task<ModuleResponse> DeleteModule(Guid moduleId)
+        public Task<bool> DeleteModule(Guid moduleId)
         {
             throw new NotImplementedException();
         }

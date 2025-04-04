@@ -16,9 +16,11 @@ namespace CourseManagementSystem.Core.Entities
         public Difficulty Difficulty { get; set; }
 
         public List<Guid> Contributors { get; set; } = new List<Guid>();
-        public List<Guid> Modules { get; set; } = new List<Guid>();
+        public List<Guid> ModuleIds { get; set; } = new List<Guid>();
 
         public List<Guid> Enrollments { get; set; } = new List<Guid>();
+
+        public List<Module> Modules { get; set; } = null!; //navigation property
 
 
     }
