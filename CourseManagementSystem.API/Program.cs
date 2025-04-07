@@ -1,6 +1,7 @@
 using CourseManagementSystem.API.Middlewares;
 using CourseManagementSystem.Core;
 using CourseManagementSystem.Infrastructure;
+using CourseManagementSystem.Infrastructure.SeedIdentity;
 
 
 
@@ -16,6 +17,14 @@ var app = builder.Build();
 app.UseExceptionHandlingMiddleware();
 app.UseRouting();
 app.MapControllers();
+
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    await SeedIdentity.SeedRolesAsync(services);
+}
+
 
 app.UseSwagger();
 app.UseSwaggerUI();
