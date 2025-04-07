@@ -11,7 +11,7 @@ namespace CourseManagementSystem.API.DTOs.Course
         public string Description { get; set; } = string.Empty;
         public Difficulty Difficulty { get; set; }
         public List<Guid> Contributors { get; set; } = new List<Guid>();
-        public List<Guid> Modules { get; set; } = new List<Guid>();
+        public List<Guid> ModuleIds { get; set; } = new List<Guid>();
         public List<Guid> Enrollments { get; set; } = new List<Guid>();
     }
 }
