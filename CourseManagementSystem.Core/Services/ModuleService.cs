@@ -3,36 +3,61 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AutoMapper;
 using CourseManagementSystem.API.DTOs;
 using CourseManagementSystem.API.ServiceContracts;
+using CourseManagementSystem.Core.Entities;
+using CourseManagementSystem.Core.RepositoryContracts;
 
 namespace CourseManagementSystem.Core.Services
 {
-    internal class ModuleService : IModuleService
+    public class ModuleService : IModuleService
     {
-        public Task<ModuleResponse> AddModule(ModuleAddRequest moduleAddRequest)
+        private readonly IModulesRepository _modulesRepository;
+        private readonly IMapper _mapper;
+
+        public ModuleService(IModulesRepository modulesRepository, IMapper mapper)
         {
-            throw new NotImplementedException();
+            _modulesRepository = modulesRepository;
+            _mapper = mapper;
+        }
+        public async Task<ModuleResponse?> AddModule(ModuleAddRequest moduleAddRequest)
+        {
+            Module module = _mapper.Map<Module>(moduleAddRequest);
+
+            module.Id = Guid.NewGuid();
+            module.CreatedAt = DateTime.UtcNow;
+            module.UpdatedAt = DateTime.UtcNow;
+
+            Module? addedModule = await _modulesRepository.AddModule(module);
+
+            if (addedModule != null)
+            {
+                return _mapper.Map<ModuleResponse>(addedModule);
+            }
+            return null;
         }
 
-        public Task<bool> DeleteModule(Guid moduleId)
+        public async Task<bool> DeleteModule(Guid moduleId)
         {
-            throw new NotImplementedException();
+            return await _modulesRepository.DeleteModule(moduleId);
         }
 
-        public Task<ModuleResponse> GetModuleById(Guid moduleId)
+        public async Task<ModuleResponse?> GetModuleById(Guid moduleId)
         {
-            throw new NotImplementedException();
+            return _mapper.Map<ModuleResponse>(await _modulesRepository.GetModuleById(moduleId));
         }
 
-        public Task<List<ModuleResponse>> GetModules()
+        public async Task<List<ModuleResponse>> GetModules()
         {
-            throw new NotImplementedException();
+            return _mapper.Map<List<ModuleResponse>>(await _modulesRepository.GetModules());
         }
 
-        public Task<ModuleResponse> UpdateModule(ModuleUpdateRequest moduleUpdateRequest)
+        public async Task<ModuleResponse> UpdateModule(ModuleUpdateRequest moduleUpdateRequest)
         {
-            throw new NotImplementedException();
+            Module module = _mapper.Map<Module>(moduleUpdateRequest);
+            module.UpdatedAt = DateTime.UtcNow;
+            return _mapper.Map<ModuleResponse>(await _modulesRepository.UpdateModule(module));
         }
     }
 }

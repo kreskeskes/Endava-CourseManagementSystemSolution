@@ -46,7 +46,7 @@ namespace CourseManagementSystem.Infrastructure.Repositories
             if (userId == Guid.Empty)
                 return null;
             Course? course = await _db.Courses.FirstOrDefaultAsync(c => c.Id == courseId);
-            course.Contributors.Add(userId);
+            course.Enrollments.Add(userId);
             await _db.SaveChangesAsync();
 
             return course;

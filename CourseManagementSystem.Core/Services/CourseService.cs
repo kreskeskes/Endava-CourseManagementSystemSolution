@@ -3,42 +3,71 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AutoMapper;
 using CourseManagementSystem.API.DTOs;
 using CourseManagementSystem.API.DTOs.Course;
 using CourseManagementSystem.API.ServiceContracts;
+using CourseManagementSystem.Core.Entities;
+using CourseManagementSystem.Core.RepositoryContracts;
 
 namespace CourseManagementSystem.Core.Services
 {
-    internal class CourseService : ICourseService
+    public class CourseService : ICourseService
     {
-        public Task<CourseResponse> AddCourse(CourseAddRequest courseAddRequest)
+        private readonly ICoursesRepository _coursesRepository;
+        private readonly IMapper _mapper;
+
+        public CourseService(ICoursesRepository coursesRepository, IMapper mapper)
         {
-            throw new NotImplementedException();
+            _coursesRepository = coursesRepository;
+            _mapper = mapper;
         }
 
-        public Task<CourseResponse> DeleteCourse(Guid courseId)
+        public async Task<CourseResponse?> AddCourse(CourseAddRequest courseAddRequest)
         {
-            throw new NotImplementedException();
+            Course course = _mapper.Map<Course>(courseAddRequest);
+
+            course.Id = Guid.NewGuid();
+            course.CreatedAt = DateTime.UtcNow;
+            course.UpdatedAt = DateTime.UtcNow;
+
+            Course? addedCourse = await _coursesRepository.AddCourse(course);
+            if (addedCourse != null)
+            {
+                return _mapper.Map<CourseResponse>(addedCourse);
+            }
+            return null;
         }
 
-        public Task<CourseResponse> EnrollUserToCourse(Guid userId)
+        public async Task<bool> DeleteCourse(Guid courseId)
         {
-            throw new NotImplementedException();
+            return await _coursesRepository.DeleteCourse(courseId);
         }
 
-        public Task<CourseResponse> GetCourseById(Guid courseId)
+        public async Task<CourseResponse> EnrollUserToCourse(Guid courseId, Guid userId)
         {
-            throw new NotImplementedException();
+            return _mapper.Map<CourseResponse>(await _coursesRepository.EnrollUserToCourse(courseId, userId));
         }
 
-        public Task<List<CourseResponse>> GetCourses()
+        public async Task<CourseResponse?> GetCourseById(Guid courseId)
         {
-            throw new NotImplementedException();
+            Course? course = await _coursesRepository.GetCourseById(courseId);
+            if (course == null)
+                return null;
+
+            return _mapper.Map<CourseResponse>(course);
+
         }
 
-        public Task<CourseResponse> UpdateCourse(CourseUpdateRequest courseUpdateRequest)
+        public async Task<List<CourseResponse>> GetCourses()
         {
-            throw new NotImplementedException();
+            return _mapper.Map<List<CourseResponse>>(await _coursesRepository.GetCourses());
+        }
+
+        public async Task<CourseResponse> UpdateCourse(CourseUpdateRequest courseUpdateRequest)
+        {
+            Course course = _mapper.Map<Course>(courseUpdateRequest);
+            return _mapper.Map<CourseResponse>(await _coursesRepository.UpdateCourse(course));
         }
     }
 }
