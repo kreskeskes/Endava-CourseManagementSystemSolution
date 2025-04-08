@@ -28,9 +28,6 @@ namespace CourseManagementSystem.Infrastructure
                 .AddUserStore<UserStore<IdentityUser<Guid>, IdentityRole<Guid>, ApplicationDbContext, Guid>>()
                 .AddRoleStore<RoleStore<IdentityRole<Guid>, ApplicationDbContext, Guid>>();
 
-
-            services.AddDefaultIdentity()
-
             services.AddScoped<ICoursesRepository, CoursesRepository>();
             services.AddScoped<IModulesRepository, ModulesRepository>();
 
