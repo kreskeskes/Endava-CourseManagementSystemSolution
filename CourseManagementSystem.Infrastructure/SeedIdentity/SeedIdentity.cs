@@ -60,6 +60,7 @@ namespace CourseManagementSystem.Infrastructure.SeedIdentity
                 {
                     administratorExists = true;
                     break;
+                  
                 }
             }
             if (!administratorExists)
@@ -77,7 +78,7 @@ namespace CourseManagementSystem.Infrastructure.SeedIdentity
                     throw new Exception("Error while seeding admin");
                 }
 
-                userManager.AddToRoleAsync(administractorUser, "Administrator");
+              await  userManager.AddToRoleAsync(administractorUser, "Administrator");
             }
         }
     }

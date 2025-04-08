@@ -110,7 +110,7 @@ namespace CourseManagementSystem.API.Controllers
         }
 
 
-        [HttpPost]
+        [HttpPost("logout")]
         public async Task<IActionResult> SignOut()
         {
             bool signOutSuccess = await _usersService.SignOutAsync();

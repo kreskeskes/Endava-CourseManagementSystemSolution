@@ -56,6 +56,8 @@ namespace CourseManagementSystem.Core.Services
 
             if (result.Succeeded)
             {
+                await _userManager.AddToRoleAsync(user, "User");
+
                 await _signInManager.SignInAsync(user, true);
                 AuthResponseDTO authResponseDTO = new AuthResponseDTO()
                 {

@@ -1,6 +1,8 @@
-﻿using CourseManagementSystem.API.DTOs.Course;
+﻿using System.Security.Claims;
+using CourseManagementSystem.API.DTOs.Course;
 using CourseManagementSystem.API.ServiceContracts;
 using CourseManagementSystem.Core.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,6 +18,7 @@ namespace CourseManagementSystem.API.Controllers
             _courseService = courseService;
         }
 
+        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetCourses()
         {
@@ -25,6 +28,7 @@ namespace CourseManagementSystem.API.Controllers
             return Ok(courses);
         }
 
+        [AllowAnonymous]
         [HttpGet("{courseId}")]
         public async Task<IActionResult> GetCourseById(Guid courseId)
         {
@@ -36,19 +40,23 @@ namespace CourseManagementSystem.API.Controllers
                 return NotFound("No course was found.");
             return Ok(course);
         }
-
+        [Authorize(Roles = "Admin,Administrator")]
         [HttpPost]
         public async Task<IActionResult> AddCourse(CourseAddRequest courseAddRequest)
         {
             if (courseAddRequest == null)
                 return BadRequest("Course add request cannot be empty.");
 
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
+                return BadRequest("Couldn't identify current user.");
+            courseAddRequest.CreatedBy = Guid.Parse(userId);
             CourseResponse? course = await _courseService.AddCourse(courseAddRequest);
             if (course == null)
                 return StatusCode(500, "Error while adding course.");
             return Ok(course);
         }
-
+        [Authorize]
         [HttpPost("enroll")]
         public async Task<IActionResult> EnrollToCourse(Guid courseId, Guid userId)
         {
@@ -64,8 +72,10 @@ namespace CourseManagementSystem.API.Controllers
             return Ok(course);
         }
 
+        [Authorize(Roles = "Admin,Administrator")]
+
         [HttpPut("{courseId}")]
-        public async Task<IActionResult> UpdateCourse(Guid courseId,CourseUpdateRequest courseUpdateRequest)
+        public async Task<IActionResult> UpdateCourse(Guid courseId, CourseUpdateRequest courseUpdateRequest)
         {
             if (courseId == Guid.Empty)
             {
@@ -75,7 +85,7 @@ namespace CourseManagementSystem.API.Controllers
             if (courseUpdateRequest == null)
                 return BadRequest("Course update request cannot be empty.");
 
-            if (courseUpdateRequest.Id!=courseId)
+            if (courseUpdateRequest.Id != courseId)
             {
                 return BadRequest("Course update request Id doesn't match course Id");
             }
@@ -86,6 +96,7 @@ namespace CourseManagementSystem.API.Controllers
             return Ok(course);
         }
 
+        [Authorize(Roles = "Admin,Administrator")]
         [HttpDelete("{courseId}")]
         public async Task<IActionResult> DeleteCourse(Guid courseId)
         {

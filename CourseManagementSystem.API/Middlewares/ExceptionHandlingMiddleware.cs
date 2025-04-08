@@ -34,7 +34,7 @@ namespace CourseManagementSystem.API.Middlewares
                     ? new { Type = ex.InnerException.GetType(), Message = ex.InnerException.Message } : null
                 };
 
-                await httpContext.Response.WriteAsJsonAsync(error);
+                await httpContext.Response.WriteAsJsonAsync(new { Error = error });
             }
         }
     }
