@@ -22,6 +22,7 @@ namespace CourseManagementSystem.Core
             services.AddValidatorsFromAssemblyContaining(typeof(ModuleAddRequestValidator));
             services.AddScoped<ICourseService, CourseService>();
             services.AddScoped<IModuleService, ModuleService>();
+            services.AddScoped<IUsersService, UsersService>();
             services.AddScoped<IJwtService, JwtService>();
 
             return services;
