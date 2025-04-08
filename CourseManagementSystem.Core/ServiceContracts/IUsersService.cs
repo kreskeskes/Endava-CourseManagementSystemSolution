@@ -13,19 +13,16 @@ namespace CourseManagementSystem.Core.ServiceContracts
     {
         public Task<IdentityResult> RegisterAsync(RegisterRequestDTO registerRequest);
 
-        public Task<IdentityResult> SignInAsync(LoginRequestDTO loginRequest);
+        public Task<SignInResult> SignInAsync(LoginRequestDTO loginRequest);
 
-        public Task<IdentityResult> SignOutAsync();
+        public Task<bool> SignOutAsync();
 
-        public Task<IdentityUser> GetUserByEmail(string email);
+        public Task<IdentityUser<Guid>?> GetUserByEmail(string email);
 
-        public Task<IdentityUser> ChangePasswordAsync(Guid userId, ChangePasswordRequets changePasswordRequets);
+        public List<IdentityUser<Guid>> GetUsers();
 
-        public Task<List<IdentityUser>> GetUsers();
+        public Task<IdentityUser<Guid>?> GetUserById(Guid userId);
 
-        public Task<IdentityUser> GetUserById(Guid userId);
-
-        public Task<List<IdentityUser>> GetFilterSortUsers(UserFilterRequest filterRequest);
 
     }
 }
