@@ -10,6 +10,6 @@ namespace CourseManagementSystem.Core.ServiceContracts
 {
     public interface IJwtService
     {
-        Task<string> GenerateJwtToken(IdentityUser<Guid> user);
+        Task<string> GenerateJwtTokenAsync(IdentityUser<Guid> user);
     }
 }

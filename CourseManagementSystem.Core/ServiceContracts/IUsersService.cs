@@ -11,9 +11,9 @@ namespace CourseManagementSystem.Core.ServiceContracts
 {
     public interface IUsersService
     {
-        public Task<IdentityResult> RegisterAsync(RegisterRequestDTO registerRequest);
+        public Task<AuthResponseDTO> RegisterAsync(RegisterRequestDTO registerRequest);
 
-        public Task<SignInResult> SignInAsync(LoginRequestDTO loginRequest);
+        public Task<AuthResponseDTO> SignInAsync(LoginRequestDTO loginRequest);
 
         public Task<bool> SignOutAsync();
 

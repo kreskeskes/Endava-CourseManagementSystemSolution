@@ -24,7 +24,7 @@ namespace CourseManagementSystem.Core.Services
             _configuration = configuration;
         }
 
-        public async Task<string> GenerateJwtToken(IdentityUser<Guid> user)
+        public async Task<string> GenerateJwtTokenAsync(IdentityUser<Guid> user)
         {
             // get user role
             IList<string> roles = await _userManager.GetRolesAsync(user);

@@ -14,13 +14,19 @@ namespace CourseManagementSystem.Core.Services
         private readonly SignInManager<IdentityUser<Guid>> _signInManager;
         private readonly UserManager<IdentityUser<Guid>> _userManager;
         private readonly RoleManager<IdentityRole<Guid>> _roleManager;
+        private readonly IJwtService _jwtService;
 
 
-        public UsersService(SignInManager<IdentityUser<Guid>> signInManager, UserManager<IdentityUser<Guid>> userManager, RoleManager<IdentityRole<Guid>> roleManager)
+        public UsersService(
+            SignInManager<IdentityUser<Guid>> signInManager,
+            UserManager<IdentityUser<Guid>> userManager,
+            RoleManager<IdentityRole<Guid>> roleManager,
+            IJwtService jwtService)
         {
             _signInManager = signInManager;
             _userManager = userManager;
             _roleManager = roleManager;
+            _jwtService = jwtService;
         }
 
         public async Task<IdentityUser<Guid>?> GetUserByEmail(string email)
@@ -38,7 +44,7 @@ namespace CourseManagementSystem.Core.Services
             return _userManager.Users.ToList();
         }
 
-        public async Task<IdentityResult> RegisterAsync(RegisterRequestDTO registerRequest)
+        public async Task<AuthResponseDTO> RegisterAsync(RegisterRequestDTO registerRequest)
         {
             IdentityUser<Guid> user = new IdentityUser<Guid>()
             {
@@ -51,18 +57,45 @@ namespace CourseManagementSystem.Core.Services
             if (result.Succeeded)
             {
                 await _signInManager.SignInAsync(user, true);
+                AuthResponseDTO authResponseDTO = new AuthResponseDTO()
+                {
+                    UserId = user.Id,
+                    Email = user.Email,
+                    Roles = (await _userManager.GetRolesAsync(user)).ToList(),
+                    Token = await _jwtService.GenerateJwtTokenAsync(user),
+                    Success = true
+                };
+
+                return authResponseDTO;
+
             }
-            return result;
+            return new AuthResponseDTO() { Success = false };
+
         }
 
-        public async Task<SignInResult> SignInAsync(LoginRequestDTO loginRequest)
+        public async Task<AuthResponseDTO> SignInAsync(LoginRequestDTO loginRequest)
         {
             IdentityUser<Guid>? user = await _userManager.FindByEmailAsync(loginRequest.Email);
-            if (user != null)
+            if (user == null)
             {
-                return await _signInManager.PasswordSignInAsync(user, loginRequest.Password, isPersistent: true, lockoutOnFailure: false);
+                return new AuthResponseDTO() { Success = false };
             }
-            return SignInResult.Failed;
+
+            var result = await _signInManager.PasswordSignInAsync(user, loginRequest.Password, isPersistent: true, lockoutOnFailure: false);
+            if (result.Succeeded)
+            {
+                AuthResponseDTO authResponseDTO = new AuthResponseDTO()
+                {
+                    Email = user.Email,
+                    UserId = user.Id,
+                    Roles = (await _userManager.GetRolesAsync(user)).ToList(),
+                    Token = await _jwtService.GenerateJwtTokenAsync(user),
+                    Success = true
+                };
+                return authResponseDTO;
+            }
+
+            return new AuthResponseDTO { Success = false };
         }
 
         public async Task<bool> SignOutAsync()

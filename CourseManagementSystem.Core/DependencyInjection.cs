@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using CourseManagementSystem.API.ServiceContracts;
 using CourseManagementSystem.Core.Mappers;
 using CourseManagementSystem.Core.RepositoryContracts;
+using CourseManagementSystem.Core.ServiceContracts;
 using CourseManagementSystem.Core.Services;
 using CourseManagementSystem.Core.Validators;
 using FluentValidation;
@@ -21,6 +22,8 @@ namespace CourseManagementSystem.Core
             services.AddValidatorsFromAssemblyContaining(typeof(ModuleAddRequestValidator));
             services.AddScoped<ICourseService, CourseService>();
             services.AddScoped<IModuleService, ModuleService>();
+            services.AddScoped<IJwtService, JwtService>();
+
             return services;
         }
     }
