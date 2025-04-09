@@ -38,6 +38,7 @@ namespace CourseManagementSystem.Infrastructure.Repositories
             }
 
             foundCourse.ModuleIds.Add(module.Id);
+            foundCourse.Contributors.Add(module.CreatedBy); // adding contribuitors as people who added a module
 
             await _db.SaveChangesAsync();
             return module;
@@ -53,7 +54,10 @@ namespace CourseManagementSystem.Infrastructure.Repositories
             Course courseWithModule = await _db.Courses.FirstOrDefaultAsync(c => c.ModuleIds.Any(mId => mId == moduleId));
 
             if (courseWithModule != null)
+            {
                 courseWithModule.ModuleIds.Remove(moduleId);
+                courseWithModule.Contributors.Remove(courseWithModule.CreatedBy);
+            }
 
             _db.Modules.Remove(module);
             await _db.SaveChangesAsync();

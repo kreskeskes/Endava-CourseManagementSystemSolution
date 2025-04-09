@@ -1,6 +1,9 @@
-﻿using CourseManagementSystem.API.DTOs;
+﻿using System.Security.Claims;
+using CourseManagementSystem.API.DTOs;
+using CourseManagementSystem.API.DTOs.Course;
 using CourseManagementSystem.API.ServiceContracts;
 using CourseManagementSystem.Core.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,7 +20,7 @@ namespace CourseManagementSystem.API.Controllers
         }
 
 
-
+        [Authorize(Roles = "User,Admin,Administrator")]
         [HttpGet]
         public async Task<IActionResult> GetModules()
         {
@@ -31,6 +34,7 @@ namespace CourseManagementSystem.API.Controllers
             return Ok(modules);
         }
 
+        [Authorize(Roles = "User,Admin,Administrator")]
         [HttpGet("{moduleId}")]
         public async Task<IActionResult> GetModuleById(Guid moduleId)
         {
@@ -44,9 +48,12 @@ namespace CourseManagementSystem.API.Controllers
             return Ok(module);
         }
 
+        [Authorize(Roles = "Admin,Administrator")]
         [HttpPut("{moduleId}")]
         public async Task<IActionResult> UpdateModule(Guid moduleId, ModuleUpdateRequest moduleUpdateRequest)
         {
+            Guid userId = GetCurrentUserId();
+
             if (moduleId == Guid.Empty)
             {
                 return BadRequest("Module id is null");
@@ -61,44 +68,70 @@ namespace CourseManagementSystem.API.Controllers
                 return BadRequest("Module update request and module Id  do not match.");
 
             }
-            ModuleResponse? module = await _moduleService.UpdateModule(moduleUpdateRequest);
 
-            if (module == null)
+            //only administrator or creator of the module can modify it
+            if ((User.Identity.IsAuthenticated && User.IsInRole("Administrator")) || userId == moduleUpdateRequest.CreatedBy)
             {
-                return NotFound("No module was found.");
+
+                ModuleResponse? module = await _moduleService.UpdateModule(moduleUpdateRequest);
+
+                if (module == null)
+                {
+                    return NotFound("No module was found.");
+                }
+
+                return Ok(module);
             }
 
-            return Ok(module);
+            return Unauthorized("You can't modify the resource unless you're administrator or resource owner.");
+
         }
 
-
+        [Authorize(Roles = "Admin,Administrator")]
         [HttpDelete("{moduleId}")]
-        public async Task<IActionResult> UpdateModule(Guid moduleId)
+        public async Task<IActionResult> DeleteModule(Guid moduleId)
         {
             if (moduleId == Guid.Empty)
             {
                 return BadRequest("Module id is null");
             }
-
-            bool isDeletionSuccess = await _moduleService.DeleteModule(moduleId);
-
-            if (!isDeletionSuccess)
+            ModuleResponse? moduleToDelete = await _moduleService.GetModuleById(moduleId);
+            if (moduleToDelete == null)
             {
-                return StatusCode(500, "Error while deleting module.");
+                return NotFound("Module to delete not found.");
+            }
+            Guid userId = GetCurrentUserId();
+            if ((User.Identity.IsAuthenticated && User.IsInRole("Administrator")) || userId == moduleToDelete.CreatedBy)
+
+            {
+                bool isDeletionSuccess = await _moduleService.DeleteModule(moduleId);
+
+                if (!isDeletionSuccess)
+                {
+                    return StatusCode(500, "Error while deleting module.");
+                }
+
+                return Ok(isDeletionSuccess);
             }
 
-            return Ok(isDeletionSuccess);
+            return Unauthorized("You can't modify the resource unless you're administrator or resource owner.");
+
         }
 
-
-        [HttpPost]
-        public async Task<IActionResult> AddModule(ModuleAddRequest moduleAddRequest)
+        [Authorize(Roles = "Admin,Administrator")]
+        [HttpPost("{courseId}")]
+        public async Task<IActionResult> AddModule(Guid courseId, ModuleAddRequest moduleAddRequest)
         {
+            Guid userId = GetCurrentUserId();
 
             if (moduleAddRequest == null)
             {
                 return BadRequest("Module add request cannot be null.");
             }
+
+
+            moduleAddRequest.CreatedBy = userId; // assigning current working user as creator
+            moduleAddRequest.CourseId = courseId; //getting courseId from route
 
             ModuleResponse? module = await _moduleService.AddModule(moduleAddRequest);
 
@@ -109,5 +142,18 @@ namespace CourseManagementSystem.API.Controllers
 
             return Ok(module);
         }
+
+        #region privateMethods
+        private Guid GetCurrentUserId()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (userId == null)
+                throw new Exception("Couldn't identify current user.");
+            return Guid.Parse(userId);
+        }
+        #endregion
     }
+
+
 }

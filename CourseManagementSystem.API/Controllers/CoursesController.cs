@@ -47,10 +47,8 @@ namespace CourseManagementSystem.API.Controllers
             if (courseAddRequest == null)
                 return BadRequest("Course add request cannot be empty.");
 
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (userId == null)
-                return BadRequest("Couldn't identify current user.");
-            courseAddRequest.CreatedBy = Guid.Parse(userId);
+            var userId = GetCurrentUserId();
+            courseAddRequest.CreatedBy = userId;
             CourseResponse? course = await _courseService.AddCourse(courseAddRequest);
             if (course == null)
                 return StatusCode(500, "Error while adding course.");
@@ -107,5 +105,18 @@ namespace CourseManagementSystem.API.Controllers
                 return StatusCode(500, "Error while deleting course.");
             return Ok(isDeletionSuccess);
         }
+
+        #region privateMethods
+        private Guid GetCurrentUserId()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (userId == null)
+                throw new Exception("Couldn't identify current user.");
+            return Guid.Parse(userId);
+        }
+        #endregion
     }
+
+
 }
