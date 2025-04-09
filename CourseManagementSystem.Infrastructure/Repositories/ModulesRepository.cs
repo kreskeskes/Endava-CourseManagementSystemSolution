@@ -25,9 +25,20 @@ namespace CourseManagementSystem.Infrastructure.Repositories
 
             if (module.CourseId == Guid.Empty)
                 throw new Exception("A module cannot exist without a course");
+
+            module.Id = Guid.NewGuid();
             module.CreatedAt = DateTime.UtcNow;
             module.UpdatedAt = DateTime.UtcNow;
             await _db.Modules.AddAsync(module);
+
+            Course foundCourse = await _db.Courses.FirstOrDefaultAsync(c => c.Id == module.CourseId);
+            if (foundCourse == null)
+            {
+                throw new Exception("No course was found for the specified Id.");
+            }
+
+            foundCourse.ModuleIds.Add(module.Id);
+
             await _db.SaveChangesAsync();
             return module;
         }
@@ -37,6 +48,12 @@ namespace CourseManagementSystem.Infrastructure.Repositories
             Module? module = await _db.Modules.FirstOrDefaultAsync(c => c.Id == moduleId);
             if (module == null)
                 return false;
+
+
+            Course courseWithModule = await _db.Courses.FirstOrDefaultAsync(c => c.ModuleIds.Any(mId => mId == moduleId));
+
+            if (courseWithModule != null)
+                courseWithModule.ModuleIds.Remove(moduleId);
 
             _db.Modules.Remove(module);
             await _db.SaveChangesAsync();

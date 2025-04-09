@@ -35,6 +35,14 @@ namespace CourseManagementSystem.Infrastructure.Repositories
             Course? foundCourse = await _db.Courses.FirstOrDefaultAsync(c => c.Id == courseId);
             if (foundCourse == null)
                 return false;
+
+
+            if (foundCourse.ModuleIds.Any())
+            {
+                List<Module> modulesFromFoundCourse = _db.Modules.Where(m => m.Id == courseId).ToList();
+                _db.Modules.RemoveRange(modulesFromFoundCourse);
+            }
+
             _db.Courses.Remove(foundCourse);
             await _db.SaveChangesAsync();
             return true;

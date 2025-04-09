@@ -25,7 +25,6 @@ namespace CourseManagementSystem.Core.Services
         {
             Module module = _mapper.Map<Module>(moduleAddRequest);
 
-            module.Id = Guid.NewGuid();
             module.CreatedAt = DateTime.UtcNow;
             module.UpdatedAt = DateTime.UtcNow;
 
