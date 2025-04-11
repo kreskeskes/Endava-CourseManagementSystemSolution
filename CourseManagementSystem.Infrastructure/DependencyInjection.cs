@@ -22,18 +22,20 @@ namespace CourseManagementSystem.Infrastructure
                 options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
             });
 
-            services.AddIdentity<IdentityUser<Guid>, IdentityRole<Guid>>(options =>
-            {
-                options.Password.RequiredLength = 6;
-                options.Password.RequireNonAlphanumeric = false;
-                options.Password.RequireUppercase = false;
-                options.Password.RequireLowercase = false;
-                options.Password.RequireDigit = false;
-            })
-                .AddEntityFrameworkStores<ApplicationDbContext>()
-                .AddDefaultTokenProviders()
-                .AddUserStore<UserStore<IdentityUser<Guid>, IdentityRole<Guid>, ApplicationDbContext, Guid>>()
-                .AddRoleStore<RoleStore<IdentityRole<Guid>, ApplicationDbContext, Guid>>();
+            services.AddScoped<IUserConfirmation<IdentityUser<Guid>>, DefaultUserConfirmation<IdentityUser<Guid>>>();
+            services.AddHttpContextAccessor();
+            services.AddScoped<IUserClaimsPrincipalFactory<IdentityUser<Guid>>, UserClaimsPrincipalFactory<IdentityUser<Guid>, IdentityRole<Guid>>>();
+            services.AddScoped<SignInManager<IdentityUser<Guid>>>();
+            //resgitering only the Identity components we need, without Auth Cookies
+            services.AddScoped<UserManager<IdentityUser<Guid>>>();
+            services.AddScoped<RoleManager<IdentityRole<Guid>>>();
+            services.AddScoped<IUserStore<IdentityUser<Guid>>, UserStore<IdentityUser<Guid>, IdentityRole<Guid>, ApplicationDbContext, Guid>>();
+            services.AddScoped<IRoleStore<IdentityRole<Guid>>, RoleStore<IdentityRole<Guid>, ApplicationDbContext, Guid>>();
+
+            //For future need to reset password/confirm email
+            services.AddScoped<IPasswordHasher<IdentityUser<Guid>>, PasswordHasher<IdentityUser<Guid>>>();
+            services.AddScoped<ILookupNormalizer, UpperInvariantLookupNormalizer>();
+            services.AddScoped<IdentityErrorDescriber>();
 
             services.AddScoped<ICoursesRepository, CoursesRepository>();
             services.AddScoped<IModulesRepository, ModulesRepository>();

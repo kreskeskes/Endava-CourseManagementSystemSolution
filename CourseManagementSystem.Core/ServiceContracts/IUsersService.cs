@@ -15,8 +15,6 @@ namespace CourseManagementSystem.Core.ServiceContracts
 
         public Task<AuthResponseDTO> SignInAsync(LoginRequestDTO loginRequest);
 
-        public Task<bool> SignOutAsync();
-
         public Task<IdentityUser<Guid>?> GetUserByEmail(string email);
 
         public List<IdentityUser<Guid>> GetUsers();

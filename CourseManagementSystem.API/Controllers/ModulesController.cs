@@ -2,6 +2,7 @@
 using CourseManagementSystem.API.DTOs;
 using CourseManagementSystem.API.DTOs.Course;
 using CourseManagementSystem.API.ServiceContracts;
+using CourseManagementSystem.Core.Constants;
 using CourseManagementSystem.Core.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -20,7 +21,7 @@ namespace CourseManagementSystem.API.Controllers
         }
 
 
-        [Authorize(Roles = "User,Admin,Administrator")]
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> GetModules()
         {
@@ -34,7 +35,7 @@ namespace CourseManagementSystem.API.Controllers
             return Ok(modules);
         }
 
-        [Authorize(Roles = "User,Admin,Administrator")]
+        [Authorize]
         [HttpGet("{moduleId}")]
         public async Task<IActionResult> GetModuleById(Guid moduleId)
         {
@@ -48,7 +49,7 @@ namespace CourseManagementSystem.API.Controllers
             return Ok(module);
         }
 
-        [Authorize(Roles = "Admin,Administrator")]
+        [Authorize(Roles = $"{Roles.Admin},{Roles.Administrator}")]
         [HttpPut("{moduleId}")]
         public async Task<IActionResult> UpdateModule(Guid moduleId, ModuleUpdateRequest moduleUpdateRequest)
         {
@@ -87,7 +88,7 @@ namespace CourseManagementSystem.API.Controllers
 
         }
 
-        [Authorize(Roles = "Admin,Administrator")]
+        [Authorize(Roles = $"{Roles.Admin},{Roles.Administrator}")]
         [HttpDelete("{moduleId}")]
         public async Task<IActionResult> DeleteModule(Guid moduleId)
         {
@@ -118,7 +119,7 @@ namespace CourseManagementSystem.API.Controllers
 
         }
 
-        [Authorize(Roles = "Admin,Administrator")]
+        [Authorize(Roles = $"{Roles.Admin},{Roles.Administrator}")]
         [HttpPost("{courseId}")]
         public async Task<IActionResult> AddModule(Guid courseId, ModuleAddRequest moduleAddRequest)
         {

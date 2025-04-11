@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CourseManagementSystem.Core.Constants;
 using CourseManagementSystem.Core.DTOs.User;
 using CourseManagementSystem.Core.ServiceContracts;
 using Microsoft.AspNetCore.Identity;
@@ -41,6 +42,8 @@ namespace CourseManagementSystem.Core.Services
 
         public List<IdentityUser<Guid>> GetUsers()
         {
+            Console.WriteLine(DateTimeOffset.UtcNow.ToUnixTimeSeconds());
+
             return _userManager.Users.ToList();
         }
 
@@ -56,7 +59,7 @@ namespace CourseManagementSystem.Core.Services
 
             if (result.Succeeded)
             {
-                await _userManager.AddToRoleAsync(user, "User");
+                await _userManager.AddToRoleAsync(user, Roles.User);
 
                 await _signInManager.SignInAsync(user, true);
                 AuthResponseDTO authResponseDTO = new AuthResponseDTO()
@@ -83,7 +86,7 @@ namespace CourseManagementSystem.Core.Services
                 return new AuthResponseDTO() { Success = false };
             }
 
-            var result = await _signInManager.PasswordSignInAsync(user, loginRequest.Password, isPersistent: true, lockoutOnFailure: false);
+            var result = await _signInManager.CheckPasswordSignInAsync(user, loginRequest.Password, lockoutOnFailure: false);
             if (result.Succeeded)
             {
                 AuthResponseDTO authResponseDTO = new AuthResponseDTO()
@@ -98,20 +101,6 @@ namespace CourseManagementSystem.Core.Services
             }
 
             return new AuthResponseDTO { Success = false };
-        }
-
-        public async Task<bool> SignOutAsync()
-        {
-            try
-            {
-                await _signInManager.SignOutAsync();
-                return true;
-            }
-            catch (Exception ex)
-            {
-                return false;
-            }
-
         }
     }
 }

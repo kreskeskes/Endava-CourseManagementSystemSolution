@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CourseManagementSystem.Core.Constants;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -10,7 +11,7 @@ namespace CourseManagementSystem.Infrastructure.SeedIdentity
 {
     public static class SeedIdentity
     {
-        private static string[] Roles = { "Admin", "Administrator", "User" };
+        private static string[] RoleList = { Roles.Admin, Roles.Administrator, Roles.User };
         public static async Task SeedRolesAsync(IServiceProvider serviceProvider)
         {
             var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
@@ -19,7 +20,7 @@ namespace CourseManagementSystem.Infrastructure.SeedIdentity
             {
                 throw new ArgumentNullException(nameof(roleManager));
             }
-            foreach (var role in Roles)
+            foreach (var role in RoleList)
             {
                 bool roleExists = await roleManager.RoleExistsAsync(role);
 
@@ -56,7 +57,7 @@ namespace CourseManagementSystem.Infrastructure.SeedIdentity
 
             foreach (var user in users)
             {
-                if (await userManager.IsInRoleAsync(user, "Administrator"))
+                if (await userManager.IsInRoleAsync(user, Roles.Administrator))
                 {
                     administratorExists = true;
                     break;
@@ -78,7 +79,7 @@ namespace CourseManagementSystem.Infrastructure.SeedIdentity
                     throw new Exception("Error while seeding admin");
                 }
 
-              await  userManager.AddToRoleAsync(administractorUser, "Administrator");
+              await  userManager.AddToRoleAsync(administractorUser, Roles.Administrator);
             }
         }
     }

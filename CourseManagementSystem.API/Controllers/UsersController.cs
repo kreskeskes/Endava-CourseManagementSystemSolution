@@ -1,5 +1,7 @@
-﻿using CourseManagementSystem.Core.DTOs.User;
+﻿using System.Security.Claims;
+using CourseManagementSystem.Core.DTOs.User;
 using CourseManagementSystem.Core.ServiceContracts;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -11,10 +13,12 @@ namespace CourseManagementSystem.API.Controllers
     public class UsersController : ControllerBase
     {
         private readonly IUsersService _usersService;
+        private readonly IJwtService _jwtService;
 
-        public UsersController(IUsersService usersService)
+        public UsersController(IUsersService usersService, IJwtService jwtService)
         {
             _usersService = usersService;
+            _jwtService = jwtService;
         }
 
         [HttpGet]
@@ -111,15 +115,40 @@ namespace CourseManagementSystem.API.Controllers
 
 
         [HttpPost("logout")]
-        public async Task<IActionResult> SignOut()
+        public IActionResult SignOut()
         {
-            bool signOutSuccess = await _usersService.SignOutAsync();
+            // Client has to remove token on its own, here we just display a message
+            return Ok(new { message = "Logged out (client-side)." });
+        }
 
-            if (!signOutSuccess)
+        [Authorize]
+        [HttpGet("whoami")]
+        public IActionResult WhoAmI()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var roles = User.FindAll(ClaimTypes.Role).Select(r => r.Value);
+
+            return Ok(new { userId, roles });
+        }
+
+        [HttpPost("refresh")]
+        public async Task<IActionResult> RefreshToken(string? expiredToken)
+        {
+            try
             {
-                return StatusCode(500, "Error while logging out.");
+                return Ok(new { token = await _jwtService.RefreshJwtTokenAsync(expiredToken) });
+
             }
-            return Ok(signOutSuccess);
+
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(ex.Message);
+            }
         }
     }
 }

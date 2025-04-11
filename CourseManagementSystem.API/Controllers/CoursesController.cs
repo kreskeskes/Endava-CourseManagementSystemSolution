@@ -1,6 +1,7 @@
 ﻿using System.Security.Claims;
 using CourseManagementSystem.API.DTOs.Course;
 using CourseManagementSystem.API.ServiceContracts;
+using CourseManagementSystem.Core.Constants;
 using CourseManagementSystem.Core.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -40,7 +41,7 @@ namespace CourseManagementSystem.API.Controllers
                 return NotFound("No course was found.");
             return Ok(course);
         }
-        [Authorize(Roles = "Admin,Administrator")]
+        [Authorize(Roles = $"{Roles.Admin},{Roles.Administrator}")]
         [HttpPost]
         public async Task<IActionResult> AddCourse(CourseAddRequest courseAddRequest)
         {
@@ -70,8 +71,7 @@ namespace CourseManagementSystem.API.Controllers
             return Ok(course);
         }
 
-        [Authorize(Roles = "Admin,Administrator")]
-
+        [Authorize(Roles = $"{Roles.Admin},{Roles.Administrator}")]
         [HttpPut("{courseId}")]
         public async Task<IActionResult> UpdateCourse(Guid courseId, CourseUpdateRequest courseUpdateRequest)
         {
@@ -94,7 +94,7 @@ namespace CourseManagementSystem.API.Controllers
             return Ok(course);
         }
 
-        [Authorize(Roles = "Admin,Administrator")]
+        [Authorize(Roles = $"{Roles.Admin},{Roles.Administrator}")]
         [HttpDelete("{courseId}")]
         public async Task<IActionResult> DeleteCourse(Guid courseId)
         {

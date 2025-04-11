@@ -11,5 +11,7 @@ namespace CourseManagementSystem.Core.ServiceContracts
     public interface IJwtService
     {
         Task<string> GenerateJwtTokenAsync(IdentityUser<Guid> user);
+
+        Task<string> RefreshJwtTokenAsync(string? expiredToken);
     }
 }

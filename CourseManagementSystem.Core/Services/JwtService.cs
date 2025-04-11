@@ -17,11 +17,13 @@ namespace CourseManagementSystem.Core.Services
     {
         private readonly UserManager<IdentityUser<Guid>> _userManager;
         private readonly IConfiguration _configuration;
+        private readonly TokenValidationParameters _tokenValidationParameters;
 
-        public JwtService(UserManager<IdentityUser<Guid>> userManager, IConfiguration configuration)
+        public JwtService(UserManager<IdentityUser<Guid>> userManager, IConfiguration configuration, TokenValidationParameters tokenValidationParameters)
         {
             _userManager = userManager;
             _configuration = configuration;
+            _tokenValidationParameters = tokenValidationParameters;
         }
 
         public async Task<string> GenerateJwtTokenAsync(IdentityUser<Guid> user)
@@ -69,6 +71,58 @@ namespace CourseManagementSystem.Core.Services
             string token = tokenHandler.WriteToken(jwtSecurityToken);
 
             return token;
+        }
+
+        public async Task<string> RefreshJwtTokenAsync(string? expiredToken)
+        {
+            if (string.IsNullOrEmpty(expiredToken))
+            {
+                throw new ArgumentException("The token is null");
+            }
+            
+            var principal = GetPrincipalFromExpiredToken(expiredToken);
+
+            if (principal == null)
+            {
+                throw new UnauthorizedAccessException("Error while identifying principal");
+            }
+
+            var userId = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (!Guid.TryParse(userId, out Guid validUserId))
+            {
+                throw new UnauthorizedAccessException("Invalid userId");
+            }
+
+          IdentityUser<Guid> user = await  _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                throw new UnauthorizedAccessException("User not found");
+            }
+
+          return await GenerateJwtTokenAsync(user);
+        }
+
+        private ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+
+            var parameters = _tokenValidationParameters.Clone();
+            parameters.ValidateLifetime = false;
+            parameters.ValidateAudience = true;
+            parameters.ValidateIssuer = true;
+            parameters.ValidateIssuerSigningKey = true;
+
+
+            var principal = tokenHandler.ValidateToken(token, parameters, out SecurityToken validatedToken);
+
+            if (validatedToken is JwtSecurityToken jwt && jwt.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCulture))
+            {
+                return principal;
+            }
+
+            return null;
+
         }
     }
 }
