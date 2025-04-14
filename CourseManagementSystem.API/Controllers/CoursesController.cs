@@ -88,6 +88,7 @@ namespace CourseManagementSystem.API.Controllers
                 return BadRequest("Course update request Id doesn't match course Id");
             }
 
+            // We want to enlist the current user in Contribuiots, in repository we do a check whether the user is already a creator,
             CourseResponse? course = await _courseService.UpdateCourse(courseUpdateRequest);
             if (course == null)
                 return StatusCode(500, "Error while updating course.");
