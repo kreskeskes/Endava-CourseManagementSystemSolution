@@ -3,6 +3,8 @@ using CourseManagementSystem.API.DTOs.Course;
 using CourseManagementSystem.API.ServiceContracts;
 using CourseManagementSystem.Core.Constants;
 using CourseManagementSystem.Core.Entities;
+using CourseManagementSystem.Core.Validators;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -41,10 +43,11 @@ namespace CourseManagementSystem.API.Controllers
                 return NotFound("No course was found.");
             return Ok(course);
         }
-        [Authorize(Roles = $"{Roles.Admin},{Roles.Administrator}")]
+        [Authorize (AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{Roles.Admin},{Roles.Administrator}")]
         [HttpPost]
         public async Task<IActionResult> AddCourse(CourseAddRequest courseAddRequest)
-        {
+        { 
+
             if (courseAddRequest == null)
                 return BadRequest("Course add request cannot be empty.");
 
@@ -55,7 +58,7 @@ namespace CourseManagementSystem.API.Controllers
                 return StatusCode(500, "Error while adding course.");
             return Ok(course);
         }
-        [Authorize]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpPost("enroll")]
         public async Task<IActionResult> EnrollToCourse(Guid courseId, Guid userId)
         {
@@ -71,7 +74,7 @@ namespace CourseManagementSystem.API.Controllers
             return Ok(course);
         }
 
-        [Authorize(Roles = $"{Roles.Admin},{Roles.Administrator}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,  Roles = $"{Roles.Admin},{Roles.Administrator}")]
         [HttpPut("{courseId}")]
         public async Task<IActionResult> UpdateCourse(Guid courseId, CourseUpdateRequest courseUpdateRequest)
         {
@@ -88,14 +91,26 @@ namespace CourseManagementSystem.API.Controllers
                 return BadRequest("Course update request Id doesn't match course Id");
             }
 
-            // We want to enlist the current user in Contribuiots, in repository we do a check whether the user is already a creator,
+            CourseResponse foundCourse = await _courseService.GetCourseById(courseId);
+            if (foundCourse == null)
+            {
+                return NotFound("No course was found for the specified id.");
+            }
+            // We want to enlist the current user in Contribuiots,  we do a check whether the user is already a creator,
+            // if yes, we remove him form contribuitors
+            var userId = GetCurrentUserId();
+            if (!foundCourse.Contributors.Contains(userId) && foundCourse.CreatedBy!=userId)
+            {
+                courseUpdateRequest.Contributors.Add(userId);
+            }
+
             CourseResponse? course = await _courseService.UpdateCourse(courseUpdateRequest);
             if (course == null)
                 return StatusCode(500, "Error while updating course.");
             return Ok(course);
         }
 
-        [Authorize(Roles = $"{Roles.Admin},{Roles.Administrator}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{Roles.Admin},{Roles.Administrator}")]
         [HttpDelete("{courseId}")]
         public async Task<IActionResult> DeleteCourse(Guid courseId)
         {

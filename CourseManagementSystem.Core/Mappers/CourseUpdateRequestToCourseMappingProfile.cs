@@ -9,19 +9,21 @@ using CourseManagementSystem.Core.Entities;
 
 namespace CourseManagementSystem.Core.Mappers
 {
-    public class CourseUpdateRequestToCourseMappingProfile :Profile
+    public class CourseUpdateRequestToCourseMappingProfile : Profile
     {
         public CourseUpdateRequestToCourseMappingProfile()
         {
             CreateMap<CourseUpdateRequest, Course>()
+
+
+              .ForMember(dest => dest.CreatedBy,
+              opt => opt.Ignore())
+
               .ForMember(dest => dest.Id,
               opt => opt.MapFrom(src => src.Id))
 
                .ForMember(dest => dest.ModuleIds,
               opt => opt.MapFrom(src => src.ModuleIds))
-
-                .ForMember(dest => dest.CreatedBy,
-              opt => opt.MapFrom(src => src.CreatedBy))
 
               .ForMember(dest => dest.Contributors,
               opt => opt.MapFrom(src => src.Contributors))

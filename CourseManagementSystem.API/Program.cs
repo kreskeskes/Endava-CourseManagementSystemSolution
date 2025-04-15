@@ -3,6 +3,10 @@ using CourseManagementSystem.API.Middlewares;
 using CourseManagementSystem.Core;
 using CourseManagementSystem.Infrastructure;
 using CourseManagementSystem.Infrastructure.SeedIdentity;
+using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
@@ -22,7 +26,7 @@ builder.Services.AddSwaggerGen(options =>
         Scheme = "Bearer",
         BearerFormat = "JWT",
         In = ParameterLocation.Header,
-        Description = "Enter JWT like: Bearer {your token}"
+        Description = "Enter your JWT Token: "
 
     };
 
@@ -64,14 +68,65 @@ builder.Services.AddSingleton(tokenValidationParameters);
 
 
 
-builder.Services.AddAuthentication("Bearer")
-    .AddJwtBearer(options =>
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+})
+.AddCookie(options =>
+{
+    options.LoginPath = "/Users/login";
+    options.AccessDeniedPath = "/Account/Denied";
+
+    options.Events.OnRedirectToLogin = context =>
     {
-        options.TokenValidationParameters = tokenValidationParameters;
+        //for an API cal return 401
+        if (context.Request.Path.StartsWithSegments("/api"))
+        {
+            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+            return Task.CompletedTask;
 
-    });
+        }
+        //for a browser call return redirect
+        else
+        {
+            context.Response.Redirect(context.RedirectUri);
+            return Task.CompletedTask;
+        }
 
-builder.Services.AddAuthorization();
+    };
+})
+.AddJwtBearer(options =>
+{
+    options.RequireHttpsMetadata = false;
+    options.SaveToken = true;
+
+
+    options.TokenValidationParameters = new TokenValidationParameters()
+    {
+        ValidateIssuer = true,
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+
+        ValidateAudience = true,
+        ValidAudience = builder.Configuration["Jwt:Audience"],
+
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])),
+
+         ClockSkew = TimeSpan.Zero,
+        ValidateLifetime = true
+    };
+
+});
+
+builder.Services.AddAuthorization(options =>
+{
+    options.DefaultPolicy = new AuthorizationPolicyBuilder
+        (CookieAuthenticationDefaults.AuthenticationScheme, JwtBearerDefaults.AuthenticationScheme)
+        .RequireAuthenticatedUser().Build();
+
+}
+);
 
 var app = builder.Build();
 
@@ -87,7 +142,7 @@ app.MapControllers();
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
-    await SeedIdentity.SeedRolesAsync(services);
+    await SeedIdentity.SeedRolesAsync(services, builder.Configuration);
 }
 
 

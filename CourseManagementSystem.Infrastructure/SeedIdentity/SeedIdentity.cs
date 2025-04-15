@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using CourseManagementSystem.Core.Constants;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CourseManagementSystem.Infrastructure.SeedIdentity
@@ -12,7 +13,7 @@ namespace CourseManagementSystem.Infrastructure.SeedIdentity
     public static class SeedIdentity
     {
         private static string[] RoleList = { Roles.Admin, Roles.Administrator, Roles.User };
-        public static async Task SeedRolesAsync(IServiceProvider serviceProvider)
+        public static async Task SeedRolesAsync(IServiceProvider serviceProvider, IConfiguration configuration)
         {
             var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
 
@@ -37,11 +38,11 @@ namespace CourseManagementSystem.Infrastructure.SeedIdentity
 
             if (roleManager.Roles.Any())
             {
-                await SeedAdministratorAsync(serviceProvider);
+                await SeedAdministratorAsync(serviceProvider,configuration );
             }
         }
 
-        private static async Task SeedAdministratorAsync(IServiceProvider serviceProvider)
+        private static async Task SeedAdministratorAsync(IServiceProvider serviceProvider, IConfiguration configuration)
         {
             var userManager = serviceProvider.GetRequiredService<UserManager<IdentityUser<Guid>>>();
             var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
@@ -68,10 +69,10 @@ namespace CourseManagementSystem.Infrastructure.SeedIdentity
             {
                 var administractorUser = new IdentityUser<Guid>()
                 {
-                    Email = "administrator@example.com",
-                    UserName = "administrator@example.com"
+                    Email = configuration["AdminSettings:AdminEmail"], //Remove magic strings
+                    UserName = configuration["AdminSettings:AdminEmail"]
                 };
-                string administratorPassword = "AdminPassword123!";
+                string administratorPassword = configuration["AdminSettings:AdminPassword"];
 
                 var result = await userManager.CreateAsync(administractorUser, administratorPassword);
                 if (!result.Succeeded)

@@ -1,6 +1,7 @@
 ﻿using System.Security.Claims;
 using CourseManagementSystem.Core.DTOs.User;
 using CourseManagementSystem.Core.ServiceContracts;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -115,10 +116,14 @@ namespace CourseManagementSystem.API.Controllers
 
 
         [HttpPost("logout")]
-        public IActionResult SignOut()
+        public async Task<IActionResult> SignOut()
         {
-            // Client has to remove token on its own, here we just display a message
-            return Ok(new { message = "Logged out (client-side)." });
+            if (User.Identity!=null && User.Identity.IsAuthenticated)
+            {
+                await HttpContext.SignOutAsync();
+                return Ok(new { message = "Logged out." });
+            }
+            return NoContent();
         }
 
         [Authorize]

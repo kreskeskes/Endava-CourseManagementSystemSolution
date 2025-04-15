@@ -55,13 +55,21 @@ namespace CourseManagementSystem.Core.Services
                 PhoneNumber = registerRequest.Phonenumber,
                 UserName = registerRequest.UserName
             };
+
+            var duplicateUser = await _userManager.FindByEmailAsync(user.Email);
+            if (duplicateUser != null)
+            {
+                throw new Exception("A user with such email has already been registered.");
+
+            }
+
             IdentityResult result = await _userManager.CreateAsync(user, registerRequest.Password);
 
             if (result.Succeeded)
             {
                 await _userManager.AddToRoleAsync(user, Roles.User);
 
-                await _signInManager.SignInAsync(user, true);
+                await _signInManager.PasswordSignInAsync(user, registerRequest.Password, false, false);
                 AuthResponseDTO authResponseDTO = new AuthResponseDTO()
                 {
                     UserId = user.Id,

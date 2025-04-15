@@ -80,17 +80,18 @@ namespace CourseManagementSystem.Infrastructure.Repositories
                 return null;
 
 
-            if (!course.ModuleIds.Any())
-            {
-                _db.Courses.Remove(foundCourse);
-                await _db.SaveChangesAsync();
-                return null;
-            }
+            //if (!course.ModuleIds.Any())
+            //{
+            //    _db.Courses.Remove(foundCourse);
+            //    await _db.SaveChangesAsync();
+            //    return null;
+            //}
 
             foundCourse.UpdatedAt = DateTime.UtcNow;
 
             foundCourse.Description = course.Description;
 
+            // TO DO : Add current user as contribuitor if not there yet
             foundCourse.Contributors = course.Contributors ?? new List<Guid>();
             foundCourse.Enrollments = course.Enrollments ?? new List<Guid>();
 
@@ -98,7 +99,7 @@ namespace CourseManagementSystem.Infrastructure.Repositories
 
             foundCourse.Difficulty = course.Difficulty;
             foundCourse.Title = course.Title;
-            foundCourse.CreatedBy = course.CreatedBy;
+            //foundCourse.CreatedBy = course.CreatedBy; We don't update stuff like this
             foundCourse.Discipline = course.Discipline;
 
 

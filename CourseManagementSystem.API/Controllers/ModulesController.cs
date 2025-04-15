@@ -4,6 +4,7 @@ using CourseManagementSystem.API.DTOs.Course;
 using CourseManagementSystem.API.ServiceContracts;
 using CourseManagementSystem.Core.Constants;
 using CourseManagementSystem.Core.Entities;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -21,7 +22,7 @@ namespace CourseManagementSystem.API.Controllers
         }
 
 
-        [Authorize]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpGet]
         public async Task<IActionResult> GetModules()
         {
@@ -35,7 +36,7 @@ namespace CourseManagementSystem.API.Controllers
             return Ok(modules);
         }
 
-        [Authorize]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpGet("{moduleId}")]
         public async Task<IActionResult> GetModuleById(Guid moduleId)
         {
@@ -49,7 +50,7 @@ namespace CourseManagementSystem.API.Controllers
             return Ok(module);
         }
 
-        [Authorize(Roles = $"{Roles.Admin},{Roles.Administrator}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{Roles.Admin},{Roles.Administrator}")]
         [HttpPut("{moduleId}")]
         public async Task<IActionResult> UpdateModule(Guid moduleId, ModuleUpdateRequest moduleUpdateRequest)
         {
@@ -70,8 +71,13 @@ namespace CourseManagementSystem.API.Controllers
 
             }
 
+           ModuleResponse foundModule =await  _moduleService.GetModuleById(moduleId);
+            if (foundModule == null)
+            {
+                return NotFound("No module found for the specified id.");
+            }
             //only administrator or creator of the module can modify it
-            if ((User.Identity.IsAuthenticated && User.IsInRole("Administrator")) || userId == moduleUpdateRequest.CreatedBy)
+            if ((User.Identity.IsAuthenticated && User.IsInRole("Administrator")) || userId == foundModule.CreatedBy)
             {
 
                 ModuleResponse? module = await _moduleService.UpdateModule(moduleUpdateRequest);
@@ -88,7 +94,7 @@ namespace CourseManagementSystem.API.Controllers
 
         }
 
-        [Authorize(Roles = $"{Roles.Admin},{Roles.Administrator}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{Roles.Admin},{Roles.Administrator}")]
         [HttpDelete("{moduleId}")]
         public async Task<IActionResult> DeleteModule(Guid moduleId)
         {
@@ -119,7 +125,7 @@ namespace CourseManagementSystem.API.Controllers
 
         }
 
-        [Authorize(Roles = $"{Roles.Admin},{Roles.Administrator}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{Roles.Admin},{Roles.Administrator}")]
         [HttpPost("{courseId}")]
         public async Task<IActionResult> AddModule(Guid courseId, ModuleAddRequest moduleAddRequest)
         {

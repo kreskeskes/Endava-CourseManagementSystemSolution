@@ -38,6 +38,7 @@ namespace CourseManagementSystem.Infrastructure.Repositories
             }
 
             foundCourse.ModuleIds.Add(module.Id);
+            if (!foundCourse.Contributors.Contains(module.CreatedBy) || foundCourse.CreatedBy!=module.CreatedBy)
             foundCourse.Contributors.Add(module.CreatedBy); // adding contribuitors as people who added a module
 
             await _db.SaveChangesAsync();

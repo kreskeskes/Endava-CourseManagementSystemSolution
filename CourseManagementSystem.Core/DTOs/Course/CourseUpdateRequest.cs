@@ -6,7 +6,6 @@ namespace CourseManagementSystem.API.DTOs.Course
     {
         public Guid Id { get; set; }
         public string Title { get; set; } = string.Empty;
-        public Guid CreatedBy { get; set; }
         public Discipline Discipline { get; set; }
         public string Description { get; set; } = string.Empty;
         public Difficulty Difficulty { get; set; }

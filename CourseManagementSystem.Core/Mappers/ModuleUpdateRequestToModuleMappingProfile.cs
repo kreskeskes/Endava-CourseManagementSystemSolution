@@ -25,7 +25,7 @@ namespace CourseManagementSystem.Core.Mappers
                 opt => opt.Ignore())
 
                 .ForMember(dest => dest.CreatedBy,
-                opt => opt.MapFrom(src => src.CreatedBy))
+                opt => opt.Ignore())
 
                 .ForMember(dest => dest.Description,
                 opt => opt.MapFrom(src => src.Description))

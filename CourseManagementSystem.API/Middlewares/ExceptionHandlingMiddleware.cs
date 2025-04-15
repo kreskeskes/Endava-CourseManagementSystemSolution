@@ -26,15 +26,15 @@ namespace CourseManagementSystem.API.Middlewares
                 httpContext.Response.StatusCode = 500;
                 httpContext.Response.ContentType = "application/json";
 
-                var error = new
-                {
-                    Type = ex.GetType(),
-                    Message = ex.Message,
-                    InnerException = ex.InnerException != null
-                    ? new { Type = ex.InnerException.GetType(), Message = ex.InnerException.Message } : null
-                };
 
-                await httpContext.Response.WriteAsJsonAsync(new { Error = error });
+                await httpContext.Response.WriteAsJsonAsync(new {Type = ex.GetType().ToString() ,Message = ex.Message.ToString() });
+
+
+                if (ex.InnerException!=null)
+                {
+                    await httpContext.Response.WriteAsJsonAsync(new { Type = ex.InnerException.GetType().ToString(), Message = ex.InnerException.Message.ToString() });
+
+                }
             }
         }
     }
