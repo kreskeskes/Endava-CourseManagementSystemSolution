@@ -18,6 +18,8 @@ namespace CourseManagementSystem.Infrastructure
 
         public DbSet<Module> Modules { get; set; }
         public DbSet<Course> Courses { get; set; }
+
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder); //for IdentityDbContext
@@ -26,6 +28,11 @@ namespace CourseManagementSystem.Infrastructure
                 .HasOne(m => m.Course)
                 .WithMany(c => c.Modules)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<RefreshToken>()
+                .HasOne(rt => rt.User)
+                .WithMany()
+                .HasForeignKey(rt => rt.UserId);
         }
     }
 }

@@ -26,7 +26,7 @@ namespace CourseManagementSystem.Core
             services.AddScoped<IModuleService, ModuleService>();
             services.AddScoped<IUsersService, UsersService>();
             services.AddScoped<IJwtService, JwtService>();
-
+            services.AddScoped<IRefreshTokenService, RefreshTokenService>();
             return services;
         }
     }

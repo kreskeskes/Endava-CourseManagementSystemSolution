@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
+﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
+using CourseManagementSystem.Core.DTOs.User;
+using CourseManagementSystem.Core.RepositoryContracts;
 using CourseManagementSystem.Core.ServiceContracts;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
@@ -18,12 +15,17 @@ namespace CourseManagementSystem.Core.Services
         private readonly UserManager<IdentityUser<Guid>> _userManager;
         private readonly IConfiguration _configuration;
         private readonly TokenValidationParameters _tokenValidationParameters;
+        private readonly IRefreshTokenService _refreshTokenService;
 
-        public JwtService(UserManager<IdentityUser<Guid>> userManager, IConfiguration configuration, TokenValidationParameters tokenValidationParameters)
+        public JwtService(UserManager<IdentityUser<Guid>> userManager,
+            IConfiguration configuration,
+            TokenValidationParameters tokenValidationParameters,
+            IRefreshTokenService refreshTokenService)
         {
             _userManager = userManager;
             _configuration = configuration;
             _tokenValidationParameters = tokenValidationParameters;
+            _refreshTokenService = refreshTokenService;
         }
 
         public async Task<string> GenerateJwtTokenAsync(IdentityUser<Guid> user)
@@ -73,14 +75,14 @@ namespace CourseManagementSystem.Core.Services
             return token;
         }
 
-        public async Task<string> RefreshJwtTokenAsync(string? expiredToken)
+        public async Task<TokenPairDTO> RefreshJwtTokenAsync(string? expiredAccessToken, string refreshToken, string ipAddress)
         {
-            if (string.IsNullOrEmpty(expiredToken))
+            if (string.IsNullOrEmpty(expiredAccessToken))
             {
                 throw new ArgumentException("The token is null");
             }
-            
-            var principal = GetPrincipalFromExpiredToken(expiredToken);
+
+            var principal = GetPrincipalFromExpiredToken(expiredAccessToken);
 
             if (principal == null)
             {
@@ -94,13 +96,33 @@ namespace CourseManagementSystem.Core.Services
                 throw new UnauthorizedAccessException("Invalid userId");
             }
 
-          IdentityUser<Guid> user = await  _userManager.FindByIdAsync(userId);
+            IdentityUser<Guid> user = await _userManager.FindByIdAsync(userId);
             if (user == null)
             {
                 throw new UnauthorizedAccessException("User not found");
             }
 
-          return await GenerateJwtTokenAsync(user);
+
+            var foundRefreshToken = await _refreshTokenService.GetByTokenAsync(refreshToken);
+
+
+            //if not already present refreshToken, revoke it, and throw Unuathorized exception
+            if (foundRefreshToken == null || !foundRefreshToken.IsActive)
+            {
+                await _refreshTokenService.RevokeAsync(foundRefreshToken, ipAddress);
+                throw new UnauthorizedAccessException("Invalid or expered refresh token.");
+            }
+
+            //generating a new refreshToken
+
+
+            var newRefreshToken = await _refreshTokenService.CreateRefreshTokenAsync(user.Id, ipAddress);
+
+            string newAccessToken = await GenerateJwtTokenAsync(user);
+
+
+            return new TokenPairDTO() { AccessTpken = newAccessToken, RefreshToken = newRefreshToken.Token };
+
         }
 
         private ClaimsPrincipal GetPrincipalFromExpiredToken(string token)

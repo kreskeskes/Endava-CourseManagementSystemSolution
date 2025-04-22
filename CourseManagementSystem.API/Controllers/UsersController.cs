@@ -1,5 +1,6 @@
 ﻿using System.Security.Claims;
 using CourseManagementSystem.Core.DTOs.User;
+using CourseManagementSystem.Core.Entities;
 using CourseManagementSystem.Core.ServiceContracts;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
@@ -15,11 +16,13 @@ namespace CourseManagementSystem.API.Controllers
     {
         private readonly IUsersService _usersService;
         private readonly IJwtService _jwtService;
+        private readonly IRefreshTokenService _refreshTokenService;
 
-        public UsersController(IUsersService usersService, IJwtService jwtService)
+        public UsersController(IUsersService usersService, IJwtService jwtService, IRefreshTokenService refreshTokenService)
         {
             _usersService = usersService;
             _jwtService = jwtService;
+            _refreshTokenService = refreshTokenService;
         }
 
         [HttpGet]
@@ -87,8 +90,22 @@ namespace CourseManagementSystem.API.Controllers
             {
                 return BadRequest("Error while logging in.");
             }
-            HttpContext.Response.Cookies.Append("my_jwt", authResponse.Token);
-            return Ok(authResponse);
+
+            var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
+
+            if (ipAddress == null)
+                return BadRequest("Failed to retrieve Ip.");
+
+            var refreshToken = await _refreshTokenService.CreateRefreshTokenAsync(authResponse.UserId, ipAddress);
+
+            HttpContext.Response.Cookies.Append("my_jwt", authResponse.Token, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTime.UtcNow.AddMinutes(15)
+            });
+            return Ok(new { AuthResponse = authResponse, RefreshToken = refreshToken.Token });
         }
 
 
@@ -111,18 +128,30 @@ namespace CourseManagementSystem.API.Controllers
                 return BadRequest("Error while registering.");
             }
 
+            var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
 
-            HttpContext.Response.Cookies.Append("my_jwt", authResponse.Token);
-            return Ok(authResponse);
+            if (ipAddress == null)
+                return BadRequest("Failed to retrieve Ip.");
+            var refreshToken = await _refreshTokenService.CreateRefreshTokenAsync(authResponse.UserId, ipAddress);
+
+            HttpContext.Response.Cookies.Append("my_jwt", authResponse.Token, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTime.UtcNow.AddMinutes(15)
+            });
+            return Ok(new { AuthResponse = authResponse, RefreshToken = refreshToken.Token });
         }
 
 
         [HttpPost("logout")]
         public async Task<IActionResult> SignOut()
         {
-            if (User.Identity!=null && User.Identity.IsAuthenticated)
+            if (User.Identity != null && User.Identity.IsAuthenticated)
             {
                 await HttpContext.SignOutAsync();
+                HttpContext.Response.Cookies.Delete("my_jwt");
                 return Ok(new { message = "Logged out." });
             }
             return NoContent();
@@ -139,11 +168,14 @@ namespace CourseManagementSystem.API.Controllers
         }
 
         [HttpPost("refresh")]
-        public async Task<IActionResult> RefreshToken(string? expiredToken)
+        public async Task<IActionResult> RefreshToken(string? expiredToken, string refreshToken)
         {
             try
             {
-                return Ok(new { token = await _jwtService.RefreshJwtTokenAsync(expiredToken) });
+                var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
+                if (ipAddress == null)
+                    return BadRequest("Failed to retrieve Ip.");
+                return Ok(await _jwtService.RefreshJwtTokenAsync(expiredToken, refreshToken, ipAddress));
 
             }
 
@@ -157,5 +189,7 @@ namespace CourseManagementSystem.API.Controllers
                 return Unauthorized(ex.Message);
             }
         }
+
+
     }
 }

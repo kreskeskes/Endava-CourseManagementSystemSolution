@@ -32,6 +32,7 @@ namespace CourseManagementSystem.Infrastructure
                 .AddDefaultTokenProviders();
             services.AddScoped<ICoursesRepository, CoursesRepository>();
             services.AddScoped<IModulesRepository, ModulesRepository>();
+            services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 
             return services;
         }
