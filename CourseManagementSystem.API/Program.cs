@@ -72,6 +72,7 @@ builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+
 })
 .AddCookie(options =>
 {
@@ -115,6 +116,16 @@ builder.Services.AddAuthentication(options =>
 
          ClockSkew = TimeSpan.Zero,
         ValidateLifetime = true
+    };
+
+    options.Events = new JwtBearerEvents()
+    {
+        OnMessageReceived = context =>
+        {
+            context.Token = context.Request.Cookies["my_jwt"];
+
+            return Task.CompletedTask;
+        }
     };
 
 });

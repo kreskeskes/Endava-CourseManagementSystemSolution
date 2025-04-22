@@ -87,7 +87,7 @@ namespace CourseManagementSystem.API.Controllers
             {
                 return BadRequest("Error while logging in.");
             }
-
+            HttpContext.Response.Cookies.Append("my_jwt", authResponse.Token);
             return Ok(authResponse);
         }
 
@@ -111,6 +111,8 @@ namespace CourseManagementSystem.API.Controllers
                 return BadRequest("Error while registering.");
             }
 
+
+            HttpContext.Response.Cookies.Append("my_jwt", authResponse.Token);
             return Ok(authResponse);
         }
 
