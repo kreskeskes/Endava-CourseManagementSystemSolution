@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CourseManagementSystem.Core.Entities;
+﻿using CourseManagementSystem.Core.Entities;
 
 namespace CourseManagementSystem.Core.RepositoryContracts
 {

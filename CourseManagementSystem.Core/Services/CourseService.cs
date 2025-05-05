@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using AutoMapper;
-using CourseManagementSystem.API.DTOs;
+﻿using AutoMapper;
 using CourseManagementSystem.API.DTOs.Course;
 using CourseManagementSystem.API.ServiceContracts;
 using CourseManagementSystem.Core.Entities;
@@ -29,7 +23,6 @@ namespace CourseManagementSystem.Core.Services
 
             course.Id = Guid.NewGuid();
             course.CreatedAt = DateTime.UtcNow;
-            course.UpdatedAt = DateTime.UtcNow;
 
             Course? addedCourse = await _coursesRepository.AddCourse(course);
             if (addedCourse != null)
@@ -64,7 +57,7 @@ namespace CourseManagementSystem.Core.Services
             return _mapper.Map<List<CourseResponse>>(await _coursesRepository.GetCourses());
         }
 
-        public async Task<CourseResponse> UpdateCourse(CourseUpdateRequest courseUpdateRequest)
+        public async Task<CourseResponse?> UpdateCourse(CourseUpdateRequest courseUpdateRequest)
         {
             Course course = _mapper.Map<Course>(courseUpdateRequest);
             return _mapper.Map<CourseResponse>(await _coursesRepository.UpdateCourse(course));

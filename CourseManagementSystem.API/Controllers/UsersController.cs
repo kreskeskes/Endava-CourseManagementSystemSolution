@@ -1,10 +1,8 @@
 ﻿using System.Security.Claims;
 using CourseManagementSystem.Core.DTOs.User;
-using CourseManagementSystem.Core.Entities;
 using CourseManagementSystem.Core.ServiceContracts;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -26,7 +24,7 @@ namespace CourseManagementSystem.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetUsers()
+        public IActionResult GetUsers()
         {
             List<IdentityUser<Guid>> users = _usersService.GetUsers();
 
@@ -45,7 +43,7 @@ namespace CourseManagementSystem.API.Controllers
             {
                 return BadRequest("User Id cannot be empty.");
             }
-            IdentityUser<Guid> user = await _usersService.GetUserById(userId);
+            IdentityUser<Guid>? user = await _usersService.GetUserById(userId);
 
             if (user == null)
             {
@@ -141,7 +139,7 @@ namespace CourseManagementSystem.API.Controllers
                 SameSite = SameSiteMode.Strict,
                 Expires = DateTime.UtcNow.AddMinutes(15)
             });
-            return Ok(new { AuthResponse = authResponse, RefreshToken = refreshToken.Token });
+            return Ok(new { AuthResponse = authResponse, RefreshToken = refreshToken?.Token });
         }
 
 

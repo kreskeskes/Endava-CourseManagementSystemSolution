@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CourseManagementSystem.API.DTOs.Course;
-using CourseManagementSystem.Core.Entities;
+﻿using CourseManagementSystem.Core.Entities;
 using CourseManagementSystem.Core.RepositoryContracts;
 using Microsoft.EntityFrameworkCore;
 

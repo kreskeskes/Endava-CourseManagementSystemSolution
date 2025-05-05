@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using CourseManagementSystem.API.DTOs;
 using CourseManagementSystem.API.ServiceContracts;
 using CourseManagementSystem.Core.Entities;
@@ -26,7 +21,6 @@ namespace CourseManagementSystem.Core.Services
             Module module = _mapper.Map<Module>(moduleAddRequest);
 
             module.CreatedAt = DateTime.UtcNow;
-            module.UpdatedAt = DateTime.UtcNow;
 
             Module? addedModule = await _modulesRepository.AddModule(module);
 
@@ -52,7 +46,7 @@ namespace CourseManagementSystem.Core.Services
             return _mapper.Map<List<ModuleResponse>>(await _modulesRepository.GetModules());
         }
 
-        public async Task<ModuleResponse> UpdateModule(ModuleUpdateRequest moduleUpdateRequest)
+        public async Task<ModuleResponse?> UpdateModule(ModuleUpdateRequest moduleUpdateRequest)
         {
             Module module = _mapper.Map<Module>(moduleUpdateRequest);
             module.UpdatedAt = DateTime.UtcNow;

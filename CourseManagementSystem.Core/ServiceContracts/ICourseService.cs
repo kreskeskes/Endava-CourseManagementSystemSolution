@@ -1,5 +1,4 @@
-﻿using CourseManagementSystem.API.DTOs;
-using CourseManagementSystem.API.DTOs.Course;
+﻿using CourseManagementSystem.API.DTOs.Course;
 
 namespace CourseManagementSystem.API.ServiceContracts
 {

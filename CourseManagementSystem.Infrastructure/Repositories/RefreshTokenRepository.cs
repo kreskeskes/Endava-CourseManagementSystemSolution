@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Security.Cryptography;
 using CourseManagementSystem.Core.Entities;
 using CourseManagementSystem.Core.RepositoryContracts;
 using Microsoft.EntityFrameworkCore;
@@ -20,7 +15,7 @@ namespace CourseManagementSystem.Infrastructure.Repositories
         }
         public async Task<RefreshToken?> GetByTokenAsync(string token)
         {
-           RefreshToken? refreshToken = await _db.RefreshTokens.FirstOrDefaultAsync(t => t.Token == token);
+            RefreshToken? refreshToken = await _db.RefreshTokens.FirstOrDefaultAsync(t => t.Token == token);
             return refreshToken;
         }
 

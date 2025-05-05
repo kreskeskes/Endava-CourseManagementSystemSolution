@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CourseManagementSystem.Core.Constants;
+﻿using CourseManagementSystem.Core.Constants;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -38,7 +33,7 @@ namespace CourseManagementSystem.Infrastructure.SeedIdentity
 
             if (roleManager.Roles.Any())
             {
-                await SeedAdministratorAsync(serviceProvider,configuration );
+                await SeedAdministratorAsync(serviceProvider, configuration);
             }
         }
 
@@ -62,7 +57,7 @@ namespace CourseManagementSystem.Infrastructure.SeedIdentity
                 {
                     administratorExists = true;
                     break;
-                  
+
                 }
             }
             if (!administratorExists)
@@ -72,7 +67,7 @@ namespace CourseManagementSystem.Infrastructure.SeedIdentity
                     Email = configuration["AdminSettings:AdminEmail"], //Remove magic strings
                     UserName = configuration["AdminSettings:AdminEmail"]
                 };
-                string administratorPassword = configuration["AdminSettings:AdminPassword"];
+                string administratorPassword = configuration["AdminSettings:AdminPassword"]!;
 
                 var result = await userManager.CreateAsync(administractorUser, administratorPassword);
                 if (!result.Succeeded)
@@ -80,7 +75,7 @@ namespace CourseManagementSystem.Infrastructure.SeedIdentity
                     throw new Exception("Error while seeding admin");
                 }
 
-              await  userManager.AddToRoleAsync(administractorUser, Roles.Administrator);
+                await userManager.AddToRoleAsync(administractorUser, Roles.Administrator);
             }
         }
     }

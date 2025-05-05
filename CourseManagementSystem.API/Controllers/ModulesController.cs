@@ -1,12 +1,9 @@
 ﻿using System.Security.Claims;
 using CourseManagementSystem.API.DTOs;
-using CourseManagementSystem.API.DTOs.Course;
 using CourseManagementSystem.API.ServiceContracts;
 using CourseManagementSystem.Core.Constants;
-using CourseManagementSystem.Core.Entities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CourseManagementSystem.API.Controllers
@@ -71,7 +68,7 @@ namespace CourseManagementSystem.API.Controllers
 
             }
 
-           ModuleResponse foundModule =await  _moduleService.GetModuleById(moduleId);
+            ModuleResponse? foundModule = await _moduleService.GetModuleById(moduleId);
             if (foundModule == null)
             {
                 return NotFound("No module found for the specified id.");

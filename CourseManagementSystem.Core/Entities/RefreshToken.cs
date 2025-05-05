@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 
 namespace CourseManagementSystem.Core.Entities
 {
@@ -18,7 +13,7 @@ namespace CourseManagementSystem.Core.Entities
         public string? CreatedByIp { get; set; }
         public string? RevokedByIp { get; set; }
         public bool IsExpired => DateTime.UtcNow >= Expires;
-        public bool IsActive => Revoked==null && !IsExpired;
+        public bool IsActive => Revoked == null && !IsExpired;
 
         public Guid UserId { get; set; }
         public IdentityUser<Guid> User { get; set; } = default!;

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CourseManagementSystem.Core.Constants;
+﻿using CourseManagementSystem.Core.Constants;
 using CourseManagementSystem.Core.DTOs.User;
 using CourseManagementSystem.Core.ServiceContracts;
 using Microsoft.AspNetCore.Identity;

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CourseManagementSystem.Core.Entities;
+﻿using CourseManagementSystem.Core.Entities;
 using CourseManagementSystem.Core.RepositoryContracts;
 using Microsoft.EntityFrameworkCore;
 
@@ -38,8 +33,8 @@ namespace CourseManagementSystem.Infrastructure.Repositories
             }
 
             foundCourse.ModuleIds.Add(module.Id);
-            if (!foundCourse.Contributors.Contains(module.CreatedBy) || foundCourse.CreatedBy!=module.CreatedBy)
-            foundCourse.Contributors.Add(module.CreatedBy); // adding contribuitors as people who added a module
+            if (!foundCourse.Contributors.Contains(module.CreatedBy) || foundCourse.CreatedBy != module.CreatedBy)
+                foundCourse.Contributors.Add(module.CreatedBy); // adding contribuitors as people who added a module
 
             await _db.SaveChangesAsync();
             return module;
@@ -52,7 +47,7 @@ namespace CourseManagementSystem.Infrastructure.Repositories
                 return false;
 
 
-            Course courseWithModule = await _db.Courses.FirstOrDefaultAsync(c => c.ModuleIds.Any(mId => mId == moduleId));
+            Course? courseWithModule = await _db.Courses.FirstOrDefaultAsync(c => c.ModuleIds.Any(mId => mId == moduleId));
 
             if (courseWithModule != null)
             {

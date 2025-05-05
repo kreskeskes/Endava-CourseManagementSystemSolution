@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using CourseManagementSystem.API.DTOs.Course;
 using CourseManagementSystem.Core.Entities;
 
@@ -15,14 +10,14 @@ namespace CourseManagementSystem.Core.Mappers
         {
             CreateMap<Course, CourseResponse>()
               .ForMember(dest => dest.Id,
-              opt => opt.MapFrom(src=>src.Id))
+              opt => opt.MapFrom(src => src.Id))
 
               .ForMember(dest => dest.CreatedAt,
-              opt => opt.MapFrom(src=>src.CreatedAt))
+              opt => opt.MapFrom(src => src.CreatedAt))
 
               .ForMember(dest => dest.UpdatedAt,
-              opt => opt.MapFrom(src=>src.UpdatedAt))
-              
+              opt => opt.MapFrom(src => src.UpdatedAt))
+
                .ForMember(dest => dest.ModuleIds,
               opt => opt.MapFrom(src => src.ModuleIds))
 

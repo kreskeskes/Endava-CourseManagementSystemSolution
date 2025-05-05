@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CourseManagementSystem.Core.Entities;
-using Microsoft.AspNetCore.Identity;
-
-namespace CourseManagementSystem.Core.DTOs.User
+﻿namespace CourseManagementSystem.Core.DTOs.User
 {
     public class AuthResponseDTO
     {

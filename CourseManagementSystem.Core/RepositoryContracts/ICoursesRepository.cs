@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CourseManagementSystem.API.DTOs.Course;
-using CourseManagementSystem.API.DTOs;
-using CourseManagementSystem.Core.Entities;
+﻿using CourseManagementSystem.Core.Entities;
 
 namespace CourseManagementSystem.Core.RepositoryContracts
 {
@@ -16,6 +9,6 @@ namespace CourseManagementSystem.Core.RepositoryContracts
         Task<Course?> UpdateCourse(Course course);
         Task<List<Course>> GetCourses();
         Task<Course?> GetCourseById(Guid courseId);
-        Task<Course> EnrollUserToCourse(Guid courseId,Guid userId);
+        Task<Course> EnrollUserToCourse(Guid courseId, Guid userId);
     }
 }

@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CourseManagementSystem.API.ServiceContracts;
+﻿using CourseManagementSystem.API.ServiceContracts;
 using CourseManagementSystem.Core.Mappers;
-using CourseManagementSystem.Core.RepositoryContracts;
 using CourseManagementSystem.Core.ServiceContracts;
 using CourseManagementSystem.Core.Services;
 using CourseManagementSystem.Core.Validators;

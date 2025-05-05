@@ -2,7 +2,6 @@
 using System.Security.Claims;
 using System.Text;
 using CourseManagementSystem.Core.DTOs.User;
-using CourseManagementSystem.Core.RepositoryContracts;
 using CourseManagementSystem.Core.ServiceContracts;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;

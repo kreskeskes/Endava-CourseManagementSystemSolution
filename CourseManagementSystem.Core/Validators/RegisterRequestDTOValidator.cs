@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CourseManagementSystem.Core.DTOs.User;
+﻿using CourseManagementSystem.Core.DTOs.User;
 using FluentValidation;
 
 namespace CourseManagementSystem.Core.Validators
@@ -22,7 +17,7 @@ namespace CourseManagementSystem.Core.Validators
 
             RuleFor(x => x.Password)
                 .NotEmpty().WithMessage("Password cannot be empty")
-                .Matches(x=>x.ConfirmPassword);
+                .Matches(x => x.ConfirmPassword);
 
             RuleFor(x => x.UserName)
                 .NotEmpty().WithMessage("Username cannot be empty");
